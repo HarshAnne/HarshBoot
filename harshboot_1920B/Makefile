@@ -1,13 +1,13 @@
 ## CONFIGURATION #############################################################
 
-TARGET = harshboot
+TARGET = harshboot_1920B
 
 ## TOOLS #####################################################################
 
-CC = @riscv64-unknown-elf-gcc
-OC = @riscv64-unknown-elf-objcopy
-OD = @riscv64-unknown-elf-objdump
-SZ = @riscv64-unknown-elf-size
+CC = riscv64-unknown-elf-gcc
+OC = riscv64-unknown-elf-objcopy
+OD = riscv64-unknown-elf-objdump
+SZ = riscv64-unknown-elf-size
 
 ## PATHS## ###################################################################
 
@@ -34,12 +34,12 @@ INCSRCS:=-I. \
 
 CFLAGS+=
 
-LDFLAGS:=-T harshboot.ld
+LDFLAGS:=-T harshboot_1920B.ld
 
 ## FILES #####################################################################
 
-SRCFILES:= boot.c
-SYSFILES:= ch32v003harsh.c image.c
+SRCFILES:= harshboot_1920B.c
+SYSFILES:= ch32v003harsh.c
 
 ## TARGETS ###################################################################
 
@@ -59,7 +59,7 @@ $(ELF) : $(SRCFILES) $(SYSFILES) dirs
 	$(OD) -t $@ > $(MAP)
 
 dirs:
-	@mkdir -p build
+	mkdir -p build
 
 clean :
 	rm -rf build

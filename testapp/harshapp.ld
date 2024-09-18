@@ -4,14 +4,19 @@ ENTRY( InterruptVector )
 
 SECTIONS
 {
+    .image_header :
+    {
+      KEEP(*(.image_header))
+    } > APPROM AT > APPROM
+
     .init :
     { 
       _sinit = .;
-      . = ALIGN(4);
+      . = ALIGN(1024);
       KEEP(*(SORT_NONE(.init)))
       . = ALIGN(4);
       _einit = .;
-    } >BOOTROM AT>BOOTROM
+    } >APPROM AT>APPROM
 
     .text : 
     {
@@ -20,41 +25,34 @@ SECTIONS
         *(.text.*)
         *(.rodata)
         *(.rodata.*)
-    } > BOOTROM AT > BOOTROM
+    } > APPROM AT > APPROM
 
     .dalign :
     {
       . = ALIGN(4);
       PROVIDE(_data_vma = .);
-    } >RAM AT>BOOTROM  
+    } >RAM AT>APPROM  
 
     .dlalign :
     {
       . = ALIGN(4); 
       PROVIDE(_data_lma = .);
-    } >BOOTROM AT>BOOTROM
+    } >APPROM AT>APPROM
 
     .data : 
     {
-      . = ALIGN(4);
-      *(.data)
-      *(.data.*)
-      PROVIDE( __global_pointer$ = . + 0x800 );
-    } > RAM AT > BOOTROM
-
-    .fill :
-    {
-      FILL(0xFF);
-      . = ORIGIN(BOOTROM) + LENGTH(BOOTROM) - 4;
-      LONG(0xEFBEADDE)
-    } > BOOTROM AT > BOOTROM
+        . = ALIGN(4);
+        *(.data)
+        *(.data.*)
+        PROVIDE( __global_pointer$ = . + 0x800 );
+    } > RAM AT > APPROM
 
     .bss :
     {
         . = ALIGN(4);
         *(.bss)
         *(.bss*)
-    } > RAM AT > BOOTROM
+    } > RAM AT > APPROM
 }
 
 _sflash = ADDR(.text);

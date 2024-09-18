@@ -2,7 +2,7 @@ ENTRY( InterruptVector )
 
 MEMORY
 {
-	FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 2K
+	FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 1920
 	RAM (xrw)  : ORIGIN = 0x20000000, LENGTH = 2K
 }
 

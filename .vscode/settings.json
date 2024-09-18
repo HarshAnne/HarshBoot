@@ -1,5 +1,9 @@
 {
     "files.associations": {
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "stdint-gcc.h": "c",
+        "memmap.h": "c",
+        "ch32v003harsh.h": "c",
+        "image.h": "c"
     }
 }
