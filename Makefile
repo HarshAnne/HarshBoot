@@ -1,65 +1,13 @@
-## CONFIGURATION #############################################################
+.PHONY: all boot app
 
-TARGET = harshboot
+all: boot app clean
 
-## TOOLS #####################################################################
+boot:
+	@$(MAKE) -C boot/ all
 
-CC = @riscv64-unknown-elf-gcc
-OC = @riscv64-unknown-elf-objcopy
-OD = @riscv64-unknown-elf-objdump
-SZ = @riscv64-unknown-elf-size
+app: boot
+	@$(MAKE) -C app/ all
 
-## PATHS## ###################################################################
-
-BUILDDIR = build
-
-## FILES #####################################################################
-
-ELF    = $(BUILDDIR)/$(TARGET).elf
-BIN    = $(BUILDDIR)/$(TARGET).bin
-HEX    = $(BUILDDIR)/$(TARGET).hex
-MAP    = $(BUILDDIR)/$(TARGET).map
-LST    = $(BUILDDIR)/$(TARGET).lst
-
-## OPTIONS ###################################################################
-
-CFLAGS:=-march=rv32emc \
-		-mabi=ilp32e \
-		-flto -ffunction-sections \
-		-nostdlib \
-		-Os
-
-INCSRCS:=-I. \
-		-I/usr/include/newlib
-
-CFLAGS+=
-
-LDFLAGS:=-T harshboot.ld
-
-## FILES #####################################################################
-
-SRCFILES:= boot.c
-SYSFILES:= ch32v003harsh.c image.c
-
-## TARGETS ###################################################################
-
-all : $(BIN) $(HEX) $(ELF) dirs
-
-$(BIN) : $(ELF)
-	$(OC) -O binary $< $@
-	$(SZ) --target binary $@
-
-$(HEX) : $(ELF)
-	$(OC) -O ihex $< $@
-	$(SZ) --target ihex $@
-
-$(ELF) : $(SRCFILES) $(SYSFILES) dirs
-	$(CC) -o $@ $(SRCFILES) $(SYSFILES) $(CFLAGS) $(LDFLAGS) $(INCSRCS)
-	$(OD) -S $@ > $(LST)
-	$(OD) -t $@ > $(MAP)
-
-dirs:
-	@mkdir -p build
-
-clean :
-	rm -rf build
+clean:
+	@$(MAKE) -C boot/ clean
+	@$(MAKE) -C app/ clean
