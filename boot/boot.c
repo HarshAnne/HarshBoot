@@ -12,28 +12,25 @@ int main(void)
     SystemInit();
     __disable_irq();
 
-    puts("Boot Init!");
+    puts("Boot");
 
     for(image_slot_t i = IMAGE_SLOT_1; i < IMAGE_NUM_SLOTS; i++)
     {
-        const image_header_t *header = image_get_header(IMAGE_SLOT_2);
+        const image_header_t *header = image_get_header(i);
 
         if(header)
         {
             // image valid
-            // __enable_irq();
+            __enable_irq();
             image_start(header);
         }
     }
-
-    // __enable_irq();
-    // Boot_StartApp(0x1400);
 
     while(1);
 }
 
 
-void Boot_StartApp(uint32_t addr)
-{
-    __ASM volatile("jr a0");
-}
+// void Boot_StartApp(uint32_t addr)
+// {
+//     __ASM volatile("jr a0");
+// }

@@ -1,6 +1,6 @@
 ## CONFIGURATION #############################################################
 
-TARGET = harshapp
+TARGET = app
 
 ## TOOLS #####################################################################
 
@@ -11,6 +11,8 @@ SZ = riscv64-unknown-elf-size
 
 ## PATHS## ###################################################################
 
+BOOTDIR = ../boot/build
+LOADERDIR = ../loader/build
 BUILDDIR = build
 LIBSDIR = ../libs
 
@@ -38,7 +40,7 @@ INCSRCS:=-I/usr/include/newlib \
 
 CFLAGS+=
 
-LDFLAGS:=-L ../ -T harshapp.ld
+LDFLAGS:=-L ../ -T app.ld
 
 ## FILES #####################################################################
 
@@ -50,7 +52,7 @@ SYSFILES+= $(LIBSDIR)/image/image.c
 
 all : $(BIN) $(HEX) $(ELF) dirs $(BUILDDIR)/harsh.bin
 
-$(BUILDDIR)/harsh.bin: ../boot/build/harshboot.bin $(BIN)
+$(BUILDDIR)/harsh.bin: $(BOOTDIR)/boot.bin $(LOADERDIR)/loader.bin $(BIN)
 	cat $^ > $@
 
 $(BIN) : $(ELF)
@@ -70,4 +72,4 @@ dirs:
 	@mkdir -p build
 
 clean :
-	rm -rf build
+	@rm -rf build

@@ -1,6 +1,6 @@
 ## CONFIGURATION #############################################################
 
-TARGET = harshboot
+TARGET = boot
 
 ## TOOLS #####################################################################
 
@@ -38,7 +38,7 @@ INCSRCS:=-I/usr/include/newlib \
 
 CFLAGS+=
 
-LDFLAGS:=-T harshboot.ld \
+LDFLAGS:=-T boot.ld \
 		-L ../
 
 ## FILES #####################################################################
@@ -48,6 +48,7 @@ SYSFILES:= $(LIBSDIR)/ch32v003/ch32v003harsh.c
 SYSFILES+= $(LIBSDIR)/image/image.c
 
 ## TARGETS ###################################################################
+.PHONY: all
 
 all : $(BIN) $(HEX) $(ELF) dirs
 
@@ -68,4 +69,4 @@ dirs:
 	@mkdir -p build
 
 clean :
-	rm -rf build
+	@rm -rf build

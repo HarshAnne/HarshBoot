@@ -1,6 +1,6 @@
 ## CONFIGURATION #############################################################
 
-TARGET = harshboot
+TARGET = loader
 
 ## TOOLS #####################################################################
 
@@ -38,12 +38,12 @@ INCSRCS:=-I/usr/include/newlib \
 
 CFLAGS+=
 
-LDFLAGS:=-T harshboot.ld \
+LDFLAGS:=-T loader.ld \
 		-L ../
 
 ## FILES #####################################################################
 
-SRCFILES:= boot.c
+SRCFILES:= loader.c dfu.c
 SYSFILES:= $(LIBSDIR)/ch32v003/ch32v003harsh.c
 SYSFILES+= $(LIBSDIR)/image/image.c
 
@@ -68,4 +68,4 @@ dirs:
 	@mkdir -p build
 
 clean :
-	rm -rf build
+	@rm -rf build

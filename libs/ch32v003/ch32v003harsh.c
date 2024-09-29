@@ -13,10 +13,10 @@ WEAK int errno;
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
 
-WEAK size_t strlen(const char *s) { const char *a = s;for (; *s; s++);return s-a; }
-WEAK void *memset(void *dest, int c, size_t n) { unsigned char *s = dest; for (; n; n--, s++) *s = c; return dest; }
+WEAK unsigned int strlen(const char *s) { const char *a = s;for (; *s; s++);return s-a; }
+WEAK void *memset(void *dest, int c, unsigned int n) { unsigned char *s = dest; for (; n; n--, s++) *s = c; return dest; }
 
-WEAK void *memcpy(void *dest, const void *src, size_t n)
+WEAK void *memcpy(void *dest, const void *src, unsigned int n)
 {
 	unsigned char *d = dest;
 	const unsigned char *s = src;
@@ -633,6 +633,10 @@ void SetupUART( int uartBRR )
 	// Push-Pull, 10MHz Output, GPIO D5, with AutoFunction
 	GPIOD->CFGLR &= ~(0xf<<(4*5));
 	GPIOD->CFGLR |= (GPIO_Speed_10MHz | GPIO_CNF_OUT_PP_AF)<<(4*5);
+
+	// Push-Pull, 10MHz Output, GPIO D6, with AutoFunction
+	GPIOD->CFGLR &= ~(0xf<<(4*6));
+	GPIOD->CFGLR |= (GPIO_Speed_10MHz | GPIO_CNF_OUT_PP_AF)<<(4*6);
 #elif defined(CH32X03x)
 	RCC->APB2PCENR |= RCC_APB2Periph_GPIOB | RCC_APB2Periph_USART1;
 
@@ -648,7 +652,7 @@ void SetupUART( int uartBRR )
 #endif
 
 	// 115200, 8n1.  Note if you don't specify a mode, UART remains off even when UE_Set.
-	USART1->CTLR1 = USART_WordLength_8b | USART_Parity_No | USART_Mode_Tx;
+	USART1->CTLR1 = USART_WordLength_8b | USART_Parity_No | USART_Mode_Tx | USART_Mode_Rx;
 	USART1->CTLR2 = USART_StopBits_1;
 	USART1->CTLR3 = USART_HardwareFlowControl_None;
 

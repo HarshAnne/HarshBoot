@@ -13,8 +13,7 @@ const image_header_t * image_get_header(image_slot_t slot)
 
     if(IMAGE_SLOT_1 == slot)
     {
-        // header = (const image_header_t *)__LOADERROM_START__;
-        header = NULL;
+        header = (const image_header_t *)&__LOADERROM_START__;
     }
     else if (IMAGE_SLOT_2 == slot)
     {

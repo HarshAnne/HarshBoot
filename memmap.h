@@ -17,8 +17,8 @@ extern uint32_t _data_lma;
 extern uint32_t _data_vma;
 extern uint32_t _sdata;
 extern uint32_t _edata;
-extern uint32_t _sflash;
-extern uint32_t _eflash;
+extern uint32_t _stext;
+extern uint32_t _etext;
 
 extern uint32_t __BOOTROM_START__;
 extern uint32_t __BOOTFROM_SIZE__;

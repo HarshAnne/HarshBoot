@@ -22,7 +22,7 @@ int main(void)
 {
     SystemInit();
 
-    puts("App Init");
+    puts("App");
 
     while(1);
 }

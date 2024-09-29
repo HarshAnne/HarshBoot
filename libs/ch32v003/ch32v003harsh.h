@@ -7302,9 +7302,9 @@ extern "C" {
 #define CR_OPTER_Reset             ((uint32_t)0xFFFFFFDF)
 #define CR_STRT_Set                ((uint32_t)0x00000040)
 #define CR_LOCK_Set                ((uint32_t)0x00000080)
-#if defined(CH32V10x) || defined(CH32V20x) || defined(CH32V30x)
+// #if defined(CH32V10x) || defined(CH32V20x) || defined(CH32V30x)
 #define CR_FAST_LOCK_Set           ((uint32_t)0x00008000)
-#endif
+// #endif
 #define CR_PAGE_PG                 ((uint32_t)0x00010000)
 #define CR_PAGE_ER                 ((uint32_t)0x00020000)
 #if defined(CH32V003) || defined(CH32V10x)
