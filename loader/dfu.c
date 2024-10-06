@@ -33,7 +33,7 @@ uint8_t dfu_buf_idx;
 
 void dfu_init(void)
 {
-    memset(dfu_buffer, 0xA5, sizeof(dfu_buffer));
+    memset(dfu_buffer, 0x00, sizeof(dfu_buffer));
     dfu_buf_idx = 0u;
 }
 
@@ -42,39 +42,27 @@ void dfu_main(void)
     uint32_t num_bytes = 0u;
     uint8_t count = 0u;
     uint32_t start_address;
-    uint32_t end_address;
     uint32_t current_address;
 
+
+    current_address = 0U;
+    start_address = 0U;
+    num_bytes = 0u;
+    
     // Read start address
     count = 4u;
     while(count)
     {
         if(USART1->STATR & USART_STATR_RXNE)
         {
+            const uint8_t tmp = (uint8_t)(USART1->DATAR & 0x1FFu);
             // little endian
-            start_address |= (USART1->DATAR & 0x1FFu) << (8*(4u - count));
+            start_address |= ((tmp) << (8*(4u - count)));
             count--;
         }
     }
 
     current_address = start_address;
-    
-    // Read end address
-    count = 4u;
-    
-    // while(count)
-    // {
-    //     if(USART1->STATR & USART_STATR_RXNE)
-    //     {
-    //         const char tmp = USART1->DATAR & 0x1FFu;
-    //         // USART1->STATR &= ~USART_STATR_RXNE;
-    //         // little endian
-    //         end_address |= (USART1->DATAR & 0x1FFu) << (8*(4u - count));
-    //         count--;
-    //     }
-    // }
-    // puts("e");
-
 
     // Read num bytes
     count = 4u;
@@ -91,34 +79,35 @@ void dfu_main(void)
     if( (start_address < 0x08001000) ||
         (start_address >= 0x08004000) )
     {
+        // puts("Invalid start address");
         return;
     }
 
     dfu_buf_idx = 0;
-    
-    // Start reading bytes 
+
     while(num_bytes)
     {
         if(dfu_buf_idx >= sizeof(dfu_buffer))
         {
             FLASH_WRITE(current_address, dfu_buffer);
-            current_address += 64;
+            current_address += 64U;
             dfu_buf_idx = 0;
-            memset(dfu_buffer, 0xA5, sizeof(dfu_buffer));
+            memset(dfu_buffer, 0, sizeof(dfu_buffer));
         }
 
         if(USART1->STATR & USART_STATR_RXNE)
         {
             // grab next byte
-            dfu_buffer[dfu_buf_idx++] = USART1->DATAR & 0x1FFu;
+            dfu_buffer[dfu_buf_idx] = (uint8_t)(USART1->DATAR & 0x1FFu);
             num_bytes--;
+            dfu_buf_idx++;
         }
     }
 
     // Process last page if there is data
     if(dfu_buf_idx > 0)
     {
-        FLASH_WRITE(0x08001000,dfu_buffer);
+        FLASH_WRITE(current_address,dfu_buffer);
         dfu_buf_idx = 0;
     }
 }
@@ -137,6 +126,7 @@ void flash_unlock_fast(void)
 void flash_lock_fast(void)
 {
     FLASH->CTLR |= CR_FAST_LOCK_Set;
+    FLASH->CTLR |= CR_LOCK_Set;
 }
 
 void flash_erase_page(uint32_t addr)
@@ -165,10 +155,10 @@ void flash_erase_page(uint32_t addr)
     FLASH->CTLR &= ~CR_PAGE_ER;
 }
 
-uint8_t flash_write_page(const uint32_t addr, uint32_t* buf)
+uint8_t flash_write_page(uint32_t addr, uint32_t* buf)
 {
     uint8_t status = 0u;
-    uint8_t num_words = 16u;
+    uint8_t num_words;
     uint32_t tmp_addr = addr;
 
     // Check the lock bit and fast lock in CTLR
@@ -184,12 +174,13 @@ uint8_t flash_write_page(const uint32_t addr, uint32_t* buf)
     // Wait for BSY bit to become 0
     while(FLASH->STATR & SR_BSY);
 
-    FLASH->STATR &= ~SR_EOP;
+    // FLASH->STATR &= ~SR_EOP;
 
+    num_words = 16u;
     while(num_words)
     {
         // Write 4bytes of data
-        *(volatile uint32_t *)(tmp_addr) = *(uint32_t *)buf;
+        *(__IO uint32_t *)(addr) = *(uint32_t *)buf;
 
         // Set bufload bit 
         FLASH->CTLR |= CR_BUF_LOAD;
@@ -197,23 +188,21 @@ uint8_t flash_write_page(const uint32_t addr, uint32_t* buf)
         // wait for BSY bit
         while(FLASH->STATR & SR_BSY);
 
-        if(!(FLASH->STATR & SR_EOP))
-        {
-            return 1u;
-        }
-        FLASH->STATR &= ~SR_EOP;
+        // if(!(FLASH->STATR & SR_EOP))
+        // {
+        //     return 1u;
+        // }
+        // FLASH->STATR &= ~SR_EOP;
 
-        tmp_addr += 4u;
+        addr += 4u;
         buf += 1u;
         num_words -= 1u;
     }
 
-    FLASH->ADDR = addr;
-
+    FLASH->CTLR |= CR_PAGE_PG;
+    FLASH->ADDR = tmp_addr;
     FLASH->CTLR |= CR_STRT_Set;
-
     while(FLASH->STATR & SR_BSY);
-
     FLASH->CTLR &= ~CR_PAGE_PG;
 
     return status;
